@@ -8,6 +8,7 @@ using Newtonsoft.Json.Serialization;
 using RaidExtractor.Core;
 using Raid.Client;
 using System.Threading.Tasks;
+using CommandLine.Text;
 
 namespace RaidExtractor
 {
@@ -41,7 +42,7 @@ namespace RaidExtractor
             public bool NoGui { get; set; }
 
             [Option('o', "output", Required = false, Default = "artifacts.json",
-              HelpText = "Destination output file name.\nDefaults to artifacts.json")]
+              HelpText = "Destination output file name.")]
             public string OutputFile { get; set; }
 
             [Option('t', "type", Required = false, Default = "json", HelpText = "Output Type: 'json' for JSON file output, 'zip' for ZIP file output.")]
@@ -55,7 +56,6 @@ namespace RaidExtractor
             Application.Run(new MainForm());
         }
 
-        [STAThread]
         static void Main(string[] args)
         {
             if (args.Length == 0)
@@ -64,63 +64,67 @@ namespace RaidExtractor
             }
             else
             {
-                var options = new Options();
+                var parserResult = CommandLine.Parser.Default.ParseArguments<Options>(args);
+                parserResult.WithParsed(Run)
+                .WithNotParsed(errs =>
+                {
+                    MessageBox.Show(HelpText.AutoBuild(parserResult), "Usage");
+                });
+            }
+        }
 
-                CommandLine.Parser.Default.ParseArguments<Options>(args)
-                    .WithParsed<Options>(o =>
+        private static void Run(Options o)
+        {
+            if (!o.NoGui)
+            {
+                RunGUI();
+                return;
+            }
+
+            RaidToolkitClient client = new RaidToolkitClient();
+            AccountDump dump;
+            try
+            {
+                client.Connect();
+                var accounts = client.AccountApi.GetAccounts().WaitForResult();
+                dump = client.AccountApi.GetAccountDump(accounts[0].Id).WaitForResult();
+                dump.FileVersion = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString(2);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"There was an error during Extraction: {ex.Message}");
+                return;
+            }
+
+            var outFile = o.OutputFile;
+            var json = JsonConvert.SerializeObject(dump, Formatting.Indented, SerializerSettings);
+            if (o.DumpType.ToLower() == "zip")
+            {
+                if (!outFile.ToLower().Contains("zip")) outFile += ".zip";
+                File.Delete(outFile);
+
+                using (var memoryStream = new MemoryStream())
+                {
+                    using (ZipArchive archive = ZipFile.Open(outFile, ZipArchiveMode.Create))
                     {
-                        if (!o.NoGui)
-                        {
-                            RunGUI();
-                            return;
-                        }
+                        var artifactFile = archive.CreateEntry("artifacts.json");
 
-                        RaidToolkitClient client = new RaidToolkitClient();
-                        AccountDump dump;
-                        try
+                        using (var entryStream = artifactFile.Open())
                         {
-                            client.Connect();
-                            var accounts = client.AccountApi.GetAccounts().WaitForResult();
-                            dump = client.AccountApi.GetAccountDump(accounts[0].Id).WaitForResult();
-                            dump.FileVersion = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString(2);
-                        }
-                        catch (Exception ex)
-                        {
-                            Console.WriteLine($"There was an error during Extraction: {ex.Message}");
-                            return;
-                        }
-
-                        var outFile = o.OutputFile;
-                        var json = JsonConvert.SerializeObject(dump, Formatting.Indented, SerializerSettings);
-                        if (o.DumpType.ToLower() == "zip")
-                        {
-                            if (!outFile.ToLower().Contains("zip")) outFile += ".zip";
-                            File.Delete(outFile);
-
-                            using (var memoryStream = new MemoryStream())
+                            using (var streamWriter = new StreamWriter(entryStream))
                             {
-                                using (ZipArchive archive = ZipFile.Open(outFile, ZipArchiveMode.Create))
-                                {
-                                    var artifactFile = archive.CreateEntry("artifacts.json");
-
-                                    using (var entryStream = artifactFile.Open())
-                                    {
-                                        using (var streamWriter = new StreamWriter(entryStream))
-                                        {
-                                            streamWriter.Write(json);
-                                        }
-                                    }
-                                }
+                                streamWriter.Write(json);
                             }
                         }
-                        else
-                        {
-                            if (o.DumpType.ToLower() != "json") Console.WriteLine("Unknown Output type. Outputting file in JSON format.");
-                            File.WriteAllText(outFile, json);
-                        }
-                        Console.WriteLine($"Output file {outFile} has been created.");
-                    });
+                    }
+                }
             }
+            else
+            {
+                if (o.DumpType.ToLower() != "json") Console.WriteLine("Unknown Output type. Outputting file in JSON format.");
+                File.WriteAllText(outFile, json);
+            }
+            Console.WriteLine($"Output file {outFile} has been created.");
         }
     }
 }
