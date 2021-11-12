@@ -7,9 +7,18 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using RaidExtractor.Core;
 using Raid.Client;
+using System.Threading.Tasks;
 
 namespace RaidExtractor
 {
+    static class TaskExtensions
+    {
+        public static T WaitForResult<T>(this Task<T> task)
+        {
+            task.Wait();
+            return task.Result;
+        }
+    }
     class Program
     {
         public static JsonSerializerSettings SerializerSettings = new JsonSerializerSettings
@@ -58,7 +67,7 @@ namespace RaidExtractor
                 var options = new Options();
 
                 CommandLine.Parser.Default.ParseArguments<Options>(args)
-                    .WithParsed<Options>(async o =>
+                    .WithParsed<Options>(o =>
                     {
                         if (!o.NoGui)
                         {
@@ -71,18 +80,14 @@ namespace RaidExtractor
                         try
                         {
                             client.Connect();
-                            var accounts = await client.AccountApi.GetAccounts();
-                            dump = await client.AccountApi.GetAccountDump(accounts[0].Id);
+                            var accounts = client.AccountApi.GetAccounts().WaitForResult();
+                            dump = client.AccountApi.GetAccountDump(accounts[0].Id).WaitForResult();
                             dump.FileVersion = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString(2);
                         }
                         catch (Exception ex)
                         {
                             Console.WriteLine($"There was an error during Extraction: {ex.Message}");
                             return;
-                        }
-                        finally
-                        {
-                            client.Disconnect();
                         }
 
                         var outFile = o.OutputFile;
