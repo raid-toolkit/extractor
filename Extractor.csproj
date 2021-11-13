@@ -3,7 +3,7 @@
   <ItemGroup>
     <PackageReference Include="CommandLineParser" Version="2.8.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
-    <PackageReference Include="raid.client" Version="0.1.0" />
+    <PackageReference Include="Raid.Client" Version="1.3.3-gf0d6b04b55" />
   </ItemGroup>
 
   <PropertyGroup>

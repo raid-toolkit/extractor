@@ -35,9 +35,10 @@
 			// 
 			// SaveButton
 			// 
-			this.SaveButton.Location = new System.Drawing.Point(12, 12);
+			this.SaveButton.Location = new System.Drawing.Point(14, 14);
+			this.SaveButton.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
 			this.SaveButton.Name = "SaveButton";
-			this.SaveButton.Size = new System.Drawing.Size(75, 23);
+			this.SaveButton.Size = new System.Drawing.Size(88, 27);
 			this.SaveButton.TabIndex = 0;
 			this.SaveButton.Text = "Save JSON";
 			this.SaveButton.UseVisualStyleBackColor = true;
@@ -53,23 +54,26 @@
 			// SaveZipFile
 			// 
 			this.SaveZipFile.AutoSize = true;
-			this.SaveZipFile.Location = new System.Drawing.Point(12, 50);
+			this.SaveZipFile.Location = new System.Drawing.Point(14, 58);
+			this.SaveZipFile.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
 			this.SaveZipFile.Name = "SaveZipFile";
-			this.SaveZipFile.Size = new System.Drawing.Size(236, 17);
+			this.SaveZipFile.Size = new System.Drawing.Size(259, 19);
 			this.SaveZipFile.TabIndex = 2;
 			this.SaveZipFile.Text = "Also save a Zipped Copy of the artifacts.json";
 			this.SaveZipFile.UseVisualStyleBackColor = true;
 			// 
 			// MainForm
 			// 
-			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+			this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(434, 75);
+			this.ClientSize = new System.Drawing.Size(506, 87);
 			this.Controls.Add(this.SaveZipFile);
 			this.Controls.Add(this.SaveButton);
 			this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
+			this.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
 			this.Name = "MainForm";
 			this.Text = "Raid Extractor";
+			this.Load += new System.EventHandler(this.MainForm_Load);
 			this.ResumeLayout(false);
 			this.PerformLayout();
 

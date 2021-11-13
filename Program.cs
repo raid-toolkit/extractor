@@ -82,7 +82,7 @@ namespace RaidExtractor
                 return;
             }
 
-            RaidToolkitClient client = new RaidToolkitClient();
+            RaidToolkitClient client = new();
             AccountDump dump;
             try
             {

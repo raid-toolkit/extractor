@@ -16,7 +16,7 @@ namespace RaidExtractor
         public MainForm()
         {
             InitializeComponent();
-            this.Icon = System.Drawing.Icon.ExtractAssociatedIcon(Application.ExecutablePath);
+            Icon = System.Drawing.Icon.ExtractAssociatedIcon(Application.ExecutablePath);
             ShowIcon = true;
             client = new RaidToolkitClient();
         }
@@ -76,6 +76,15 @@ namespace RaidExtractor
             {
                 client.Disconnect();
             }
+        }
+
+		private async void MainForm_Load(object sender, EventArgs e)
+		{
+            try
+            {
+                await client.EnsureInstalled();
+            }
+            catch (Exception) { }
         }
     }
 }
