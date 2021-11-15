@@ -6,6 +6,7 @@ using RaidExtractor.Core;
 using System.IO.Compression;
 using System.Threading.Tasks;
 using Raid.Client;
+using Raid.DataModel;
 
 namespace RaidExtractor
 {
@@ -83,8 +84,29 @@ namespace RaidExtractor
             try
             {
                 await client.EnsureInstalled();
+                await GetAccountsAsync();
             }
             catch (Exception) { }
         }
+
+		private async Task GetAccountsAsync()
+		{
+			
+
+			try
+			{
+				client.Connect();
+				Account[] accounts = await client.AccountApi.GetAccounts();
+				//AccountsListBox.Items.AddRange(accounts); I love you
+			}
+			catch (Exception e)
+			{
+				MessageBox.Show(e.ToString());
+			}
+            finally
+			{
+				client.Disconnect();
+			}
+		}
     }
 }
