@@ -25,7 +25,6 @@ namespace RaidExtractor
         {
             var result = await GetDump();
             if (result == null) return;
-            result.FileVersion = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString(2);
             if (SaveJSONDialog.ShowDialog() != DialogResult.OK) return;
 
             try
@@ -78,11 +77,11 @@ namespace RaidExtractor
             }
         }
 
-		private async void MainForm_Load(object sender, EventArgs e)
-		{
+        private async void MainForm_Load(object sender, EventArgs e)
+        {
             try
             {
-                await client.EnsureInstalled();
+                await RaidToolkitClient.EnsureInstalled();
             }
             catch (Exception) { }
         }

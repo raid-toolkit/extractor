@@ -89,7 +89,6 @@ namespace RaidExtractor
                 client.Connect();
                 var accounts = client.AccountApi.GetAccounts().WaitForResult();
                 dump = client.AccountApi.GetAccountDump(accounts[0].Id).WaitForResult();
-                dump.FileVersion = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString(2);
             }
             catch (Exception ex)
             {
