@@ -18,6 +18,7 @@
     <AssemblyName>Raid.Extractor</AssemblyName>
     <RootNamespace>Raid.Extractor</RootNamespace>
     <ApplicationIcon>Resources\AppIcon.ico</ApplicationIcon>
+    <Platforms>x64</Platforms>
   </PropertyGroup>
 
 </Project>
